@@ -1,0 +1,198 @@
+{% extends 'studygroup/layout.html' %}
+{% block head %}
+    <style>
+                
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #e9ecef;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        h1 {
+            color: #343a40;
+            text-align: center;
+            margin-top: 0;
+        }
+
+        .links {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .links a {
+            color: #007bff;
+            text-decoration: none;
+            margin: 0 10px;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+
+        .links a:hover {
+            color: #0056b3;
+        }
+
+        .admin {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        #members-button {
+            display: block;
+            margin: 0 auto 20px;
+            padding: 10px 20px;
+            border-radius: 5px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s;
+        }
+
+        #members-button:hover {
+            background-color: #0056b3;
+        }
+
+        #members-list {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        #members-list h2 {
+            text-align: center;
+            color: #343a40;
+            margin-top: 0;
+        }
+
+        #members-list ul {
+            list-style-type: none;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        #members-list li {
+            margin: 5px 10px;
+        }
+
+        #members-list a {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+
+        #members-list a:hover {
+            color: #0056b3;
+        }
+
+        #chat-messages {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        #chat-form {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        #chat-form input {
+            flex-grow: 1;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ced4da;
+            margin-right: 10px;
+            font-size: 16px;
+        }
+
+        #chat-form button {
+            padding: 10px 20px;
+            border-radius: 5px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s;
+        }
+
+        #chat-form button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+
+    
+    <h1>Chatroom: {{ chatroom.name }}</h1>
+    <a href="{% url 'studygroup:course_detail' subject_id course_id %}">Back to Course Details</a>
+
+    <a href="{% url 'studygroup:chatroom_resources' chatroom.id %}">Helpful Resources</a>
+
+    
+    <p>Admin: {{ chatroom.created_by.username }}</p>
+
+    <button id="members-button">View Members</button>
+    <div id="members-list" style="display: none;">
+        <h2>Members</h2>
+        <ul>
+            {% for member in members %}
+                
+                <li>
+                    <a href="{% url 'studygroup:profile' member.id %}">{{ member.username }}</a>
+                </li>
+            
+            {% endfor %}
+        </ul>
+    </div>
+
+
+    <div id="chat-messages">
+        {% for message in messages %}
+            <div>{{ message.user }}: {{ message.content }}</div>
+        {% endfor %}
+    </div>
+    <form id="chat-form" method="post">
+        {% csrf_token %}
+        <input type="text" name="message" placeholder="Type your message..." required>
+        <button type="submit">Send</button>
+    </form>
+
+    
+
+    <script>
+        
+        document.getElementById('members-button').addEventListener('click', () => {
+            const membersList = document.getElementById('members-list');
+            if (membersList.style.display === 'none') {
+                membersList.style.display = 'block';
+            } else {
+                membersList.style.display = 'none';
+            }
+        });
+
+        
+
+        
+    </script>
+{% endblock %}

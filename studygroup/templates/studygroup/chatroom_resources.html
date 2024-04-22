@@ -1,0 +1,199 @@
+{% extends 'studygroup/layout.html' %}
+{% block head %}
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #e9ecef;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        h2, h3 {
+            color: #343a40;
+            text-align: center;
+        }
+
+        .links {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .links a {
+            color: #007bff;
+            text-decoration: none;
+            margin: 0 10px;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+
+        .links a:hover {
+            color: #0056b3;
+        }
+
+        .resources {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            width: 80%;
+        }
+
+        .resources ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .resources li {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #ced4da;
+        }
+
+        .resources img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 10px 0;
+        }
+
+        .resources a {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+
+        .resources a:hover {
+            color: #0056b3;
+        }
+
+        #uploadForm {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            width: 80%;
+        }
+
+        #uploadForm label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        #uploadForm input, #uploadForm textarea, #uploadForm select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border: 1px solid #ced4da;
+            font-size: 16px;
+        }
+
+        #uploadForm button[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s;
+        }
+
+        #uploadForm button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        #addButton {
+            display: block;
+            margin: 0 auto;
+            padding: 10px 20px;
+            border-radius: 5px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s;
+        }
+
+        #addButton:hover {
+            background-color: #0056b3;
+        }
+    </style>
+{% endblock %}
+{% block body %}
+    <h2>{{ chatroom.name }} Resources</h2>
+    
+    <a href="{% url 'studygroup:chatroom_view' chatroom_id  %}">Back to ChatRoom</a>
+    <h3>List of Resources</h3>
+    {% if resources %}
+        <ul>
+        {% for resource in resources %}
+            <li>
+                {{ resource.get_short_description }} by {{ resource.user.username }} ({{ resource.created_at|timesince }})
+                {% if resource.type == 'IMAGE' %}
+                    <img src="{{ resource.image.url }}" alt="{{ resource.description }}" />
+                {% elif resource.type == 'VIDEO' %}
+                    <a href="{{ resource.video_url }}">View Video</a>
+                {% else %}
+                    <a href="{{ resource.link }}">Visit Link</a>
+                {% endif %}
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>There are no resources shared in this chatroom yet.</p>
+    {% endif %}
+
+    {% if user.is_authenticated %}
+        <!-- <h2>Upload a Resource</h2> -->
+        <form id = "uploadForm" method="post" enctype="multipart/form-data" style="display: none;">
+            {% csrf_token %}
+            <label for="resource_type">Resource Type:</label>
+            <select name="resource_type" id="resource_type">
+                <option value="IMAGE">Image</option>
+                <option value="VIDEO">Video URL</option>
+                <option value="LINK">Link</option>
+            </select><br>
+            <label for="resource_file">Resource File (for Image):</label>
+            <input type="file" name="resource_file" id="resource_file" accept="image/*" /><br>
+            <label for="resource_url">Video URL (optional):</label>
+            <input type="url" name="resource_url" id="resource_url" placeholder="Enter video URL" /><br>
+            <label for="resource_link">Link (optional):</label>
+            <input type="url" name="resource_link" id="resource_link" placeholder="Enter link" /><br>
+            <label for="description">Description (optional):</label>
+            <textarea name="description" id="description" rows="4" cols="50"></textarea><br>
+            <button type="submit">Upload Resource</button>
+        </form>
+    {% endif %}
+    <button id="addButton">Add Resource</button>
+
+    <script>
+        
+        document.getElementById('addButton').addEventListener('click', () => {
+        const resource = document.getElementById('uploadForm');
+        if (resource.style.display === 'none') {
+            resource.style.display = 'block';
+        } else {
+            resource.style.display = 'none';
+        }
+        });
+
+        
+        
+    </script>
+
+{% endblock %}    
